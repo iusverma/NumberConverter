@@ -137,10 +137,21 @@ public class NovaGalaxyTradeDealing{
         while(iter.hasNext()){
             String content = iter.next();
             if(content.charAt(content.length()-1) == '?'){
+                /* Assumption: if a sentence is finishing with ?, it is a request 
+                 * for quotation. E.g. How much is xyz gold cost ?
+                 */
                 tradeData.add(content);
             }else if(RomanNumber.isRomanNumber(content.charAt(content.length()-1))){
+                /* Assumption: for Nova Galaxy dealing, since we know that numbers
+                 * of this galazxy are same as roman numbers, so we assume that if
+                 * there is any roman number at the end of sentence, then it is 
+                 * mapping from galaxy number to roman number.
+                 */
                 numbersData.add(content);
             }else{
+                /* Assumption: if a sentence does not fall in above two categories,
+                 * then it must be giving an estimate of some material price.
+                 */
                 costData.add(content);
             }
         }
