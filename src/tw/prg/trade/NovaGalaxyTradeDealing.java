@@ -183,6 +183,13 @@ public class NovaGalaxyTradeDealing{
     private void convert() {
         System.out.println("[TradeDealing.convert]");
         if(converter != null){
+           	/* TODO: This is call even though doesn't seem to be necessary as per flow,
+        	 * however internally it is initializing NovaGalaxyNumber, so if we don't 
+        	 * make this call, we will not get the final numbers.
+        	 * Need to figure out why NovaGalaxyNumber was not initialized in 
+        	 * initializeNumber() call.
+        	 */
+            ngToRomanConvertedNumbers
             ngToRomanConvertedNumbers = converter.convert(inputData);
         }
         System.out.println("[TradeDealing.convert] Total Line Converted: "+ngToRomanConvertedNumbers.size());
