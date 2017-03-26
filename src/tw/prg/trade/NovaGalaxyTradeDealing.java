@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 import tw.prg.base.Converter;
 import tw.prg.base.InputInterface;
 import tw.prg.base.OutputInterface;
+import tw.prg.base.TradeDealing;
 import tw.prg.factory.ConverterFactory;
 import tw.prg.impl.FileInputReader;
 import tw.prg.impl.FileOutputWriter;
@@ -23,12 +24,7 @@ import tw.prg.impl.RomanToDecimalConverter;
  * This class is responsible for end to end trading with NovaGalaxy, it takes their
  * cost evaluation, and then provides trade in their units.
  */
-public class NovaGalaxyTradeDealing{
-
-    /**
-     * Holds input data
-     */
-    private List<String> inputData = null;
+public class NovaGalaxyTradeDealing extends TradeDealing{
 
     /**
      * Holds Nova Galaxy Numbers data from input data
@@ -56,21 +52,6 @@ public class NovaGalaxyTradeDealing{
     private Map<String,Double> materialPerUnitPrice = null;
 
     /**
-     * Holds converter for Nova Galaxy
-     */
-    private Converter converter= null;
-
-    /**
-     * Holds data input interface for Nova Galaxy
-     */
-    private InputInterface input = null;
-
-    /**
-     * Holds data input interface for Nova Galaxy
-     */
-    private OutputInterface output = null;
-
-    /**
      * Holds a Nova Galaxy number
      */
     private NovaGalaxyNumber novaGalaxyNumber = null;
@@ -80,14 +61,21 @@ public class NovaGalaxyTradeDealing{
      * initializes necessary members
      */
     public NovaGalaxyTradeDealing(){
-        input = new FileInputReader();
-        inputData = new ArrayList<>();              
+        if(input==null){
+            input = new FileInputReader();
+        }
+        if(inputData != null){
+            inputData = new ArrayList<>();
+        }
+        if(output==null){
+            output = new FileOutputWriter();
+        }
         numbersData = new ArrayList<>();
         costData = new ArrayList<>();
         tradeData = new ArrayList<>();        
         materialPerUnitPrice = new HashMap<String, Double>();
         ngToRomanConvertedNumbers = new ArrayList<>();
-        output = new FileOutputWriter();
+
     }
 
     /**
@@ -95,7 +83,7 @@ public class NovaGalaxyTradeDealing{
      */
     public void trade(){
         // Reads input
-        getInput();
+        readInput();
         
         // categorizing numbers data, cost value, new trade details from input
         categorizeInputData();
@@ -109,12 +97,6 @@ public class NovaGalaxyTradeDealing{
         // converting input to Roman format
         convert();
         
-        // populating cost value
-        populateCostEstimation();
-        
-        // preparing new price proposal
-        translateCostEstimation();
-        
         // Writing data to output
         offerTrade();     
     }
@@ -122,7 +104,7 @@ public class NovaGalaxyTradeDealing{
     /**
      * This reads a file from disc and initializes inputData
      */
-    private void getInput() {
+    protected void readInput() {
         System.out.println("[TradeDealing.getInput]");
         input.getInput(inputData);
         System.out.println("[TradeDealing.getInput] Total Line Read: "+inputData.size());
@@ -131,7 +113,7 @@ public class NovaGalaxyTradeDealing{
     /**
      * Based on inputData numberData, costData & tradeData are categorized
      */
-    private void categorizeInputData() {
+    protected void categorizeInputData() {
         System.out.println("[TradeDealing.categorizeInputData]");
         Iterator<String> iter = inputData.iterator();
         while(iter.hasNext()){
@@ -163,7 +145,7 @@ public class NovaGalaxyTradeDealing{
     /**
      * Initializes novaGalaxyNumber, taking data from inputData
      */
-    private void initializeNumber() {
+    protected void initializeNumber() {
         System.out.println("[TradeDealing.initializeNumber]");
         novaGalaxyNumber = new NovaGalaxyNumber();
         novaGalaxyNumber.init(inputData);
@@ -172,7 +154,7 @@ public class NovaGalaxyTradeDealing{
     /**
      * Prepare Nova Galaxy to Roman Number Converter
      */
-    private void prepareConverter() {
+    protected void prepareConverter() {
         System.out.println("[TradeDealing.getConverter]");
         converter = ConverterFactory.getConverter(ConverterFactory.NOVA_GALAXY_TO_ROMAN);
     }
@@ -180,19 +162,23 @@ public class NovaGalaxyTradeDealing{
     /**
      * Request for converting Nova Galaxy numbers to Roman numbers
      */
-    private void convert() {
+    protected void convert() {
         System.out.println("[TradeDealing.convert]");
         if(converter != null){
-           	/* TODO: This is call even though doesn't seem to be necessary as per flow,
-        	 * however internally it is initializing NovaGalaxyNumber, so if we don't 
-        	 * make this call, we will not get the final numbers.
-        	 * Need to figure out why NovaGalaxyNumber was not initialized in 
-        	 * initializeNumber() call.
-        	 */
-            ngToRomanConvertedNumbers
+            /* TODO: This is call even though doesn't seem to be necessary as per flow,
+             * however internally it is initializing NovaGalaxyNumber, so if we don't 
+             * make this call, we will not get the final numbers.
+             * Need to figure out why NovaGalaxyNumber was not initialized in 
+             * initializeNumber() call.
+             */
             ngToRomanConvertedNumbers = converter.convert(inputData);
         }
         System.out.println("[TradeDealing.convert] Total Line Converted: "+ngToRomanConvertedNumbers.size());
+        // populating cost value
+        populateCostEstimation();
+        
+        // preparing new price proposal
+        translateCostEstimation();
     }
 
     /**
@@ -309,7 +295,7 @@ public class NovaGalaxyTradeDealing{
     /**
      * Providing the final proposal for all requested trades in desired location
      */
-    private void offerTrade(){
+    protected void offerTrade(){
         System.out.println("[TradeDealing.offerTrade]");
         output.offerTrade(ngToRomanConvertedNumbers);
         System.out.println("[TradeDealing.getInput] Total Trade Converted: "+ngToRomanConvertedNumbers.size());
