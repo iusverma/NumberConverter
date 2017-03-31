@@ -46,39 +46,12 @@ public class NovaGalaxyToRomanConverter implements Converter{
      *                          for NovaGalaxyNumber in input
      */
     public List<String> convert(List<String> inputData) {
+        /*
+         * For now it's only purpose is to initialize baseNumberMap for NovaGalaxyNumber,
+         * This will be used later in convert(String)
+         */
         fromNumber.init(inputData);
         List<String> convertedValue = new ArrayList<>();
-        Iterator<String> iter = inputData.iterator();
-        while(iter.hasNext()){
-            String proposition = iter.next();
-            if(proposition.charAt(proposition.length()-1) == '?'){
-                String arr[] = proposition.split(" ");
-                int i = 0;
-                String ngNumber = "";
-                String equivalentRoman = "";
-                while(!arr[i].equalsIgnoreCase("?")){
-                    String word = arr[i];
-                    if(fromNumber.getBaseNumberMap().containsKey(word)==true){
-                        ngNumber += word + " ";
-                        equivalentRoman+=fromNumber.getBaseNumberMap().get(word);
-                    }
-                    i++;
-                };
-                if(!ngNumber.isEmpty() && !equivalentRoman.isEmpty()){
-                    ngNumber.trim();
-                    equivalentRoman.trim();
-                    String ngToRoman = "";
-                    System.out.println("[NovaGalaxyToRomanConverter.convert] Nova Galaxy Number: "+ngNumber);
-                    System.out.println("[NovaGalaxyToRomanConverter.convert] Roman Number: "+equivalentRoman);
-                    ngToRoman = ngNumber + "is " + equivalentRoman;
-                    convertedValue.add(ngToRoman);
-                }                
-            }else{
-                System.out.println(
-                        "[NovaGalaxyToRomanConverter.convert] This is a statement and not a proposition. "
-                        +proposition);
-            }
-        }
         return convertedValue;
     }
     

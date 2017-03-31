@@ -79,29 +79,6 @@ public class NovaGalaxyTradeDealing extends TradeDealing{
     }
 
     /**
-     * This is the start of trade, it runs end to end flow
-     */
-    public void trade(){
-        // Reads input
-        readInput();
-        
-        // categorizing numbers data, cost value, new trade details from input
-        categorizeInputData();
-        
-        // initializing Nova Galaxy number format
-        initializeNumber();
-        
-        // creating Nova Galaxy to Roman number converter
-        prepareConverter();
-        
-        // converting input to Roman format
-        convert();
-        
-        // Writing data to output
-        offerTrade();     
-    }
-
-    /**
      * This reads a file from disc and initializes inputData
      */
     protected void readInput() {
@@ -165,11 +142,10 @@ public class NovaGalaxyTradeDealing extends TradeDealing{
     protected void convert() {
         System.out.println("[TradeDealing.convert]");
         if(converter != null){
-            /* TODO: This is call even though doesn't seem to be necessary as per flow,
-             * however internally it is initializing NovaGalaxyNumber, so if we don't 
-             * make this call, we will not get the final numbers.
-             * Need to figure out why NovaGalaxyNumber was not initialized in 
-             * initializeNumber() call.
+            /* Inside convert(String List) function, fromNumber.init() is being called,
+             * this is initializing baseNumberMap for romanNumber, which is later referred
+             * in convert(String). Hence if following convert is not called, other convert
+             * is not able to translate values. Need a fix for this.
              */
             ngToRomanConvertedNumbers = converter.convert(inputData);
         }
